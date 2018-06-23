@@ -16,6 +16,7 @@ const mongoRepository = new MongoRepository(Config);
 // Connect to the db
 mongoRepository.connect();
 
+
 app.listen(port, () => {
     console.log(`Server started on port ${port}`);
 });

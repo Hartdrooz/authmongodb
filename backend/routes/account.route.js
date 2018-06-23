@@ -8,7 +8,9 @@ class AccountRoute {
     init() {
         const router = this.express.Router();
 
-        router.post('/register', () => { });
+        router.post('/register', () => {
+
+        });
 
         return router;
     }
