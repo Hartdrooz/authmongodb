@@ -13,9 +13,21 @@ class MongoRepository {
         this._user = null;
     }
 
-    async connect() {
-        await this.mongoose.connect(this.config.mongoCnxString);
-        this.createSchema();
+    connect() {
+        return new Promise((resolve,reject) => {
+
+            this.mongoose.connect(this.config.mongoCnxString, (err) => {
+                if (err) {
+                    console.log(`Error connection to MongoDB : ${err}`);
+                    reject();
+                    return;
+                }
+                console.log('Creating Schema')
+                this.createSchema();
+                resolve();
+            });
+    
+        });
     }
 
     createSchema() {
