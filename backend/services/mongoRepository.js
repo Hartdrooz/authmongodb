@@ -15,7 +15,6 @@ class MongoRepository {
 
     connect() {
         return new Promise((resolve,reject) => {
-
             this.mongoose.connect(this.config.mongoCnxString, (err) => {
                 if (err) {
                     console.log(`Error connection to MongoDB : ${err}`);

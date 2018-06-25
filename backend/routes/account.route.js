@@ -1,14 +1,51 @@
 
+const jwt = require('jsonwebtoken');
 
 class AccountRoute {
-    constructor(express, mongoRepository) {
+    constructor(express, mongoRepository, passport, config) {
         this.express = express;
         this.mongoRepository = mongoRepository;
+        this.passport = passport;
+        this.config = config;
     }
 
     init() {
         const router = this.express.Router();
         
+
+        router.post('/login',(req,res,next) => {
+            try {
+                this.passport.authenticate('local',{session:false},(err,user,info) => {
+                
+                    console.log(err);
+                    if (err || !user){
+                        return res.status(400).json({
+                            message: info ? info.message : 'Login failed',
+                            user   : user
+                        });
+                    }
+    
+                    req.login(user,{session:false},(err) => {
+    
+                        if (err){
+                            res.send(err);
+                            return;
+                        }
+    
+                        // Create the token
+                        const token = jwt.sign(user,this.config.JwtSecretKey);
+    
+                        res.json({user,token});
+                    });
+                })(req,res,next);;
+            } catch (error) {
+                console.log(error);
+                res.status(500);
+                req.send('Internal Server Error');
+            }
+
+        });
+
         router.post('/', (req, res) => {
             console.log('inside register route');
             const email = req.body.email;

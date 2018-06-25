@@ -1,15 +1,47 @@
 const passport = require('passport');
-const LocalStrategy = require('passport-local');
+const LocalStrategy = require('passport-local').Strategy;
+const passportJWT = require('passport-jwt');
+const ExtractJWT = passportJWT.ExtractJwt;
+const JWTStrategy   = passportJWT.Strategy;
 
 class AuthService {
 
-    constructor() {
-
+    constructor(config,passport,mongoRepository) {
+        this.config = config;
+        this.passport = passport;
+        this.mongoRepository = mongoRepository;
     }
 
     init() {
-        passport.use(new LocalStrategy((username, password, done) => {
-            User.findOne()
+        this.passport.use(new LocalStrategy({},(email, password, done) => {
+            this.mongoRepository.User.findOne({email,password},(err,user) => {
+                if (err){
+                    done(null,false,{message: 'Cannot connect right now'});
+                    return;
+                }
+                if (!user) {
+                    done(null, false, {message: 'Incorrect email or password.'});
+                    return;
+                }
+
+                // Compare the password
+                console.log(user);
+
+                done(null, user, {
+                    message: 'Logged In Successfully'
+                });
+            });
+        }));
+
+        this.passport.use(new JWTStrategy({
+            jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+            secretOrKey: this.config.JwtSecretKey
+        },(jwtPayload, cb) => {
+
+            console.log(jwtPayload);
+
+            // Add any validation here
+            cb();
         }));
     }
 }
