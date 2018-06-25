@@ -13,7 +13,10 @@ class AuthService {
     }
 
     init() {
-        this.passport.use(new LocalStrategy({},(email, password, done) => {
+        this.passport.use(new LocalStrategy({
+            usernameField: 'email',
+            passwordField: 'password'
+        },(email, password, done) => {
             this.mongoRepository.User.findOne({email,password},(err,user) => {
                 if (err){
                     done(null,false,{message: 'Cannot connect right now'});

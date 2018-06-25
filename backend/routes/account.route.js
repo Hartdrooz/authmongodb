@@ -14,36 +14,42 @@ class AccountRoute {
         
 
         router.post('/login',(req,res,next) => {
-            try {
-                this.passport.authenticate('local',{session:false},(err,user,info) => {
-                
-                    console.log(err);
-                    if (err || !user){
-                        return res.status(400).json({
-                            message: info ? info.message : 'Login failed',
-                            user   : user
-                        });
-                    }
-    
-                    req.login(user,{session:false},(err) => {
-    
-                        if (err){
-                            res.send(err);
-                            return;
-                        }
-    
-                        // Create the token
-                        const token = jwt.sign(user,this.config.JwtSecretKey);
-    
-                        res.json({user,token});
+          
+            this.passport.authenticate('local',{session:false},(err,user,info) => {
+            
+                console.log(err);
+                if (err || !user){
+                    return res.status(400).json({
+                        message: info ? info.message : 'Login failed',
+                        user   : user
                     });
-                })(req,res,next);;
-            } catch (error) {
-                console.log(error);
-                res.status(500);
-                req.send('Internal Server Error');
-            }
+                }
 
+                req.login(user,{session:false},(err) => {
+
+                    if (err){
+                        res.send(err);
+                        return;
+                    }
+
+                    // Create the token
+                    try {
+                        const token = jwt.sign(user.toJSON(), this.config.JwtSecretKey, {
+                            expiresIn: 86400 // 1 day valid token (this can be changed)
+                        });
+
+                        //const token = jwt.sign(user,this.config.JwtSecretKey);
+
+                        res.json({user,token});              
+                    } catch (error) {
+                        console.log(error);
+                        res.status(500);
+                        res.send('error');
+                    }
+
+                });
+            })(req,res,next);;
+         
         });
 
         router.post('/', (req, res) => {
