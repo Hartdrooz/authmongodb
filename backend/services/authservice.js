@@ -27,10 +27,14 @@ class AuthService {
                     return;
                 }
 
-                // Compare the password
-                console.log(user);
-
-                done(null, user, {
+                // Compare the password here
+                if (user.password != password){
+                    done(null, false, {message: 'Incorrect email or password.'});
+                    return;
+                }
+                // Return the list of the role to the client
+                // this can be used in guard in Angular
+                done(null, {role:user.role}, {
                     message: 'Logged In Successfully'
                 });
             });
@@ -39,12 +43,19 @@ class AuthService {
         this.passport.use(new JWTStrategy({
             jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
             secretOrKey: this.config.JwtSecretKey
-        },(jwtPayload, cb) => {
-
-            console.log(jwtPayload);
-
-            // Add any validation here
-            cb();
+        },(jwtPayload, done) => {
+            // To be sure the client didn't altered the JWT
+            // we get the info again to see if the user exists and
+            // it's role (double validation on server and client side)
+            this.mongoRepository.User.findById(jwtPayload.id,(err,user) =>{
+                if (err){
+                    done(err,false)
+                }else if(user){
+                    done(null,{role: user.role});
+                }else{
+                    done(null,false);
+                }
+            });
         }));
     }
 }

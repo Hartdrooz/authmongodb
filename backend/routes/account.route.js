@@ -31,8 +31,8 @@ class AccountRoute {
                         res.send(err);
                         return;
                     }
-
-                    const token = jwt.sign(user.toJSON(), this.config.JwtSecretKey, {
+                    // Encrypt the role to not send it plain text
+                    const token = jwt.sign({role: user.role, id: user.id}, this.config.JwtSecretKey, {
                         expiresIn: 86400 // 1 day valid token (this can be changed)
                     });
 
@@ -44,13 +44,15 @@ class AccountRoute {
         });
 
         router.post('/', (req, res) => {
-            console.log('inside register route');
+          
             const email = req.body.email;
             const password = req.body.password;
+            const role = req.body.role;
 
             const user = new this.mongoRepository.User({
                 email: email,
-                password: password
+                password: password,
+                role: role
             });
 
             user.save((err,result) => {
@@ -60,6 +62,7 @@ class AccountRoute {
                     res.send('Internal Server error');
                 }else{
                     res.status(204);
+                    res.send();
                 }
             });
 

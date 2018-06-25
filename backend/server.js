@@ -3,17 +3,20 @@ const bodyParser = require('body-parser');
 const Config = require('./shared/config');
 const MongoRepository = require('./services/mongoRepository');
 const passport = require('passport');
+const cors = require('cors');
 const AuthService = require('./services/authservice');
 const app = express();
 
 // Routes
-const AccountRoute = new require('./routes/account.route')
+const AccountRoute = require('./routes/account.route')
+const HomeRoute = require('./routes/home.route');
 
 const port = process.env.PORT || 3000;
 
 // Configure middleware
+app.use(cors()); // Allow all (for demo purpose)
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(passport.initialize());
 
 // Create instance services/repository
@@ -27,7 +30,10 @@ mongoRepository.connect().then(() => {
     
     // // Import the route
     const accountRoute = new AccountRoute(express,mongoRepository,passport,Config);
+    const homeRoute = new HomeRoute(express);
+
     app.use('/api/account',accountRoute.init());
+    app.use('/api/home',passport.authenticate('jwt',{session:false}),homeRoute.init());
 
     // catch 404 and forward to error handler
     app.use(function(req, res, next) {
