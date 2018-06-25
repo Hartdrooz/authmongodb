@@ -32,20 +32,11 @@ class AccountRoute {
                         return;
                     }
 
-                    // Create the token
-                    try {
-                        const token = jwt.sign(user.toJSON(), this.config.JwtSecretKey, {
-                            expiresIn: 86400 // 1 day valid token (this can be changed)
-                        });
+                    const token = jwt.sign(user.toJSON(), this.config.JwtSecretKey, {
+                        expiresIn: 86400 // 1 day valid token (this can be changed)
+                    });
 
-                        //const token = jwt.sign(user,this.config.JwtSecretKey);
-
-                        res.json({user,token});              
-                    } catch (error) {
-                        console.log(error);
-                        res.status(500);
-                        res.send('error');
-                    }
+                    res.json({user,token});              
 
                 });
             })(req,res,next);;
