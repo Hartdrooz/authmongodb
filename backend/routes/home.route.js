@@ -11,20 +11,20 @@ class HomeRoute {
             // Retrieve the role (this can be encapsulated in a middleware)
             if (req.user.role === "Admin"){
                 res.status(200);
-                res.send('You have access the data has admin');
+                res.send({message:'You have access the data has admin'});
             }else{
                 res.status(401);
-                res.send('Unauthorized');
+                res.send({error:'Unauthorized'});
             }
         });
 
         router.get('/guest',(req,res) => {
             if (req.user.role === "Guest"){
                 res.status(200);
-                res.send('You have access the data has gues');
+                res.send({message:'You have access the data has guest'});
             }else{
                 res.status(401);
-                res.send('Unauthorized');
+                res.send({error:'Unauthorized'});
             }
         });
 

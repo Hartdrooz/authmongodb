@@ -34,7 +34,8 @@ class AuthService {
                 }
                 // Return the list of the role to the client
                 // this can be used in guard in Angular
-                done(null, {role:user.role}, {
+                // The id is passed in the token to validate it again
+                done(null, {role:user.role,id: user.id}, {
                     message: 'Logged In Successfully'
                 });
             });

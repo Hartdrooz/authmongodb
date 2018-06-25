@@ -1,7 +1,8 @@
-import { Component } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { NgForm } from "@angular/forms";
 import { DataService } from "../service/data.service";
+import { SessionService } from "../service/session.service";
 
 @Component({
     templateUrl: './login.component.html',
@@ -16,15 +17,22 @@ import { DataService } from "../service/data.service";
         `
     ]
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
 
-    constructor(private dataService:DataService,private router:Router){}
+    constructor(private dataService:DataService,
+                private sessionService:SessionService,
+                private router:Router){}
+
+    ngOnInit(): void {
+        this.sessionService.deleteSession();
+    }
 
     onSubmit(f:NgForm){
         this.dataService
             .login(f.value.email,f.value.password)
-            .subscribe((result) => {
-                console.log(result);
+            .subscribe((result:any) => {
+                this.sessionService.saveSession(result.token);
+                this.router.navigate(['/main']);
             });
                        
     }

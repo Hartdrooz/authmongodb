@@ -11,6 +11,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { routes } from './route';
 import { DataService } from './service/data.service';
 import { ToastrService } from './service/toastr.service';
+import { SessionService } from './service/session.service';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { ToastrService } from './service/toastr.service';
   ],
   providers: [
     DataService,
-    ToastrService
+    ToastrService,
+    SessionService
   ],
   bootstrap: [AppComponent]
 })
